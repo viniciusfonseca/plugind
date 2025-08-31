@@ -5,7 +5,6 @@ edition = "2024"
 
 [dependencies]
 plugin-mesh-core = { path = "../plugin-mesh-core" }
-plugin-mesh-macros = { path = "../plugin-mesh-macros" }
 futures = "0.3"
 
 [lib]

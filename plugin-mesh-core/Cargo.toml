@@ -4,5 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+plugin-mesh-macros = { path = "../plugin-mesh-macros" }
 futures = "0.3"
 

@@ -1,5 +1,4 @@
-use plugin_mesh_core::context::{Context, InvokeResult};
-use plugin_mesh_macros::plugin;
+use plugin_mesh_core::{context::{Context, InvokeResult}, plugin};
 
 #[plugin]
 pub async fn init(input: Vec<u8>, mut ctx: Context) -> InvokeResult {
