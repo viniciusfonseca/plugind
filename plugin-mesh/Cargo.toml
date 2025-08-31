@@ -1,0 +1,18 @@
+[package]
+name = "plugin-mesh"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.99"
+axum = { version = "0.8.4", features = ["macros"] }
+plugin-mesh-core = { path = "../plugin-mesh-core" }
+futures = "0.3"
+libloading = "0.8.8"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1", features = ["full"] }
+
+[[bin]]
+name = "plugin-mesh"
+path = "src/main.rs"

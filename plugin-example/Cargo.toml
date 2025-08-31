@@ -1,0 +1,13 @@
+[package]
+name = "plugin-example"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+plugin-mesh-core = { path = "../plugin-mesh-core" }
+plugin-mesh-macros = { path = "../plugin-mesh-macros" }
+futures = "0.3"
+
+[lib]
+name = "plugin_example"
+crate-type = ["cdylib"]

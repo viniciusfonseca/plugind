@@ -1,0 +1,8 @@
+[workspace]
+resolver = "3"
+members = ["plugin-mesh", "plugin-example", "plugin-mesh-core", "plugin-mesh-macros"]
+
+[profile.release]
+lto = true
+strip = true
+opt-level = 3
