@@ -23,6 +23,7 @@ mod tests {
             unimplemented!()
         }
         let output = futures::executor::block_on(f(input.into(), Context::new(invoke)));
-        assert_eq!(output, InvokeResult::Ok(b"Hello World".to_vec()));
+        assert!(output.is_ok());
+        assert_eq!(output.unwrap(), b"Hello World".to_vec());
     }
 }
