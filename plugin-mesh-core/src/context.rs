@@ -1,20 +1,6 @@
 use futures::{future::BoxFuture, AsyncWriteExt};
 
-#[derive(Debug)]
-pub enum InvokeResult {
-    Ok(Vec<u8>),
-    Err(Vec<u8>)
-}
-
-impl PartialEq for InvokeResult {
-    fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
-            (InvokeResult::Ok(a), InvokeResult::Ok(b)) => a == b,
-            (InvokeResult::Err(a), InvokeResult::Err(b)) => a == b,
-            _ => false
-        }
-    }
-}
+pub type InvokeResult = anyhow::Result<Vec<u8>>;
 
 pub type InvokeFn = fn(String, Vec<u8>) -> BoxFuture<'static, InvokeResult>;
 

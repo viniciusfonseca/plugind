@@ -496,6 +496,7 @@ dependencies = [
 name = "plugin-mesh-core"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "futures",
  "plugin-mesh-macros",
 ]

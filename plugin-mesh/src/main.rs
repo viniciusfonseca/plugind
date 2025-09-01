@@ -17,7 +17,7 @@ struct InvokePayload {
 async fn invoke_handler(axum::Json(payload): axum::Json<InvokePayload>) -> impl IntoResponse {
     match invoke_plugin(payload.lib_name, serde_json::to_vec(&payload.params).unwrap()).await {
         InvokeResult::Ok(output_buffer) => (axum::http::StatusCode::OK, output_buffer),
-        InvokeResult::Err(output_buffer) => (axum::http::StatusCode::INTERNAL_SERVER_ERROR, output_buffer)
+        InvokeResult::Err(err) => (axum::http::StatusCode::INTERNAL_SERVER_ERROR, err.to_string().as_bytes().to_vec())
     }
 }
 
