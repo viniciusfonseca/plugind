@@ -7,6 +7,7 @@ use crate::{context::MESH_CONTEXT, invoke::invoke_plugin};
 
 mod context;
 mod invoke;
+mod upload;
 
 #[derive(Deserialize)]
 struct InvokePayload {
@@ -24,15 +25,18 @@ async fn invoke_handler(axum::Json(payload): axum::Json<InvokePayload>) -> impl 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> anyhow::Result<()> {
 
-    let libs_path = std::env::var("LIBS_PATH")?;
     let addr_listen = std::env::var("ADDR_LISTEN")?;
 
+    let config = aws_config::load_from_env().await;
+    let client = aws_sdk_s3::Client::new(&config);
+
     {
-        MESH_CONTEXT.write().await.set_libs_path(&libs_path);
+        MESH_CONTEXT.write().await.set_storage(&client);
     }
 
     let router = axum::Router::new()
-        .route("/", axum::routing::post(invoke_handler));
+        .route("/", axum::routing::post(invoke_handler))
+        .route("/plugins", axum::routing::post(upload::plugin_upload));
 
     let listener = tokio::net::TcpListener::bind(addr_listen).await?;
 

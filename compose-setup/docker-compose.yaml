@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  plugin-mesh:
+    build:
+      context: ./plugin-mesh
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      ADDR_LISTEN: 0.0.0.0:8080
+    
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    volumes:
+      - minio_data:/data
+
+volumes:
+  minio_data:

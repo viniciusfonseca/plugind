@@ -1,6 +1,12 @@
 [workspace]
 resolver = "3"
-members = ["plugin-mesh", "plugin-example", "plugin-mesh-core", "plugin-mesh-macros"]
+members = [
+    "plugin-mesh",
+    "plugin-example",
+    "plugin-mesh-core",
+    "plugin-mesh-macros",
+    "pluginctl"
+]
 
 [profile.release]
 lto = true

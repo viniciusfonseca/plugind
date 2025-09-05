@@ -16,10 +16,21 @@ pub fn invoke_plugin(lib_name: String, input: Vec<u8>) -> BoxFuture<'static, Inv
     
         if !libs_contains_key_lib_name {
             let ctx = MESH_CONTEXT.read().await;
-            let lib_path = format!("{}/{}.so", ctx.libs_path, lib_name);
-            let lib = unsafe { Library::new(&lib_path)? };
+            let storage = ctx.storage.as_ref().unwrap();
+            let lib = storage.get_object()
+                .bucket("plugins")
+                .key(&lib_name)
+                .send()
+                .await
+                .unwrap();
+            let lib = lib.body.collect().await.unwrap();
+            let lib = lib.into_bytes();
+            let id = uuid::Uuid::new_v4().to_string();
+            let tmp_path = format!("/tmp/{}", id);
+            tokio::fs::write(&tmp_path, lib.to_vec()).await.unwrap();
             let mut libs = ctx.libs.write().await;
-            libs.insert(lib_name.clone(), lib);
+            libs.insert(lib_name.clone(), unsafe { Library::new(&tmp_path)? });
+            tokio::fs::remove_file(&tmp_path).await.unwrap();
         }
     
         let ctx = MESH_CONTEXT.read().await;

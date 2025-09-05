@@ -4,17 +4,17 @@ use tokio::sync::RwLock;
 
 #[derive(Clone)]
 pub struct MeshContext {
-    pub libs_path: String,
+    pub storage: Option<aws_sdk_s3::Client>,
     pub libs: Arc<RwLock<HashMap<String, Library>>>,
 }
 
 impl MeshContext {
-    pub fn set_libs_path(&mut self, libs_path: &String) {
-        self.libs_path = libs_path.clone();
+    pub fn set_storage(&mut self, storage: &aws_sdk_s3::Client) {
+        self.storage = Some(storage.clone());
     }
 }
 
 pub static MESH_CONTEXT: LazyLock<Arc<RwLock<MeshContext>>> = LazyLock::new(|| Arc::new(RwLock::new(MeshContext {
-    libs_path: String::new(),
+    storage: None,
     libs: Default::default(),
 })));
