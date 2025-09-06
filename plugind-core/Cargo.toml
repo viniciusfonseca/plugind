@@ -1,10 +1,10 @@
 [package]
-name = "plugin-mesh-core"
+name = "plugind-core"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
 anyhow = "1.0"
-plugin-mesh-macros = { path = "../plugin-mesh-macros" }
+plugind-macros = { path = "../plugind-macros" }
 futures = "0.3"
 

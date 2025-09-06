@@ -1,25 +1,25 @@
-# Plugin Mesh - Rust Plugin System
+# plugind - Rust Plugin System
 
-Plugin Mesh is a plugin system example made with Rust.
+plugind is a plugin system example made with Rust.
 
 **It relies heavily on the unstable Rust ABI and must not be used on prod unless you know what you're doing.**
 
 It has 4 crates:
 
-### `plugin-mesh`
+### `plugind`
 
 The system that manages the plugins. It loads plugins from an arbitrary path upon request, executes the plugin entrypoint and returns the execution result.
 
-### `plugin-mesh-core`
+### `plugind-core`
 
 Library that provides the plugin interface. Basically a function that takes a `Vec<u8>` and an execution context and returns a `BoxFuture<'static, InvokeResult>`. `InvokeResult` is an enum that takes a `Vec<u8>` both for `Ok` and `Err`.
 
-### `plugin-mesh-macros`
+### `plugind-macros`
 
 Library that provides a `#[plugin]` helper macro for creating plugins. With it you can create plugins like this:
 
 ```rs
-use plugin_mesh_core::{context::{Context, InvokeResult}, plugin};
+use plugind_core::{context::{Context, InvokeResult}, plugin};
 
 #[plugin]
 pub async fn init(input: Vec<u8>, mut ctx: Context) -> InvokeResult {
@@ -33,7 +33,7 @@ pub async fn init(input: Vec<u8>, mut ctx: Context) -> InvokeResult {
 
 ### `plugin-example`
 
-Example plugin made with `plugin-mesh-core` and `plugin-mesh-macros`.
+Example plugin made with `plugind-core` and `plugind-macros`.
 
 To run the example:
 

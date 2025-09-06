@@ -1,21 +1,21 @@
 use futures::future::BoxFuture;
-use plugin_mesh_core::{context::{Context, InvokeResult}, LibraryFn};
+use plugind_core::{context::{Context, InvokeResult}, LibraryFn};
 use libloading::{Library, Symbol};
 
-use crate::context::MESH_CONTEXT;
+use crate::context::DAEMON_CONTEXT;
 
 pub fn invoke_plugin(lib_name: String, input: Vec<u8>) -> BoxFuture<'static, InvokeResult> {
 
     Box::pin(async move {
 
         let libs_contains_key_lib_name = {
-            let ctx = MESH_CONTEXT.read().await;
+            let ctx = DAEMON_CONTEXT.read().await;
             let libs = ctx.libs.read().await;
             libs.contains_key(&lib_name)
         };
     
         if !libs_contains_key_lib_name {
-            let ctx = MESH_CONTEXT.read().await;
+            let ctx = DAEMON_CONTEXT.read().await;
             let storage = ctx.storage.as_ref().unwrap();
             let lib = storage.get_object()
                 .bucket("plugins")
@@ -33,7 +33,7 @@ pub fn invoke_plugin(lib_name: String, input: Vec<u8>) -> BoxFuture<'static, Inv
             tokio::fs::remove_file(&tmp_path).await.unwrap();
         }
     
-        let ctx = MESH_CONTEXT.read().await;
+        let ctx = DAEMON_CONTEXT.read().await;
         let libs = ctx.libs.read().await;
         let lib = libs.get(&lib_name).unwrap();
     

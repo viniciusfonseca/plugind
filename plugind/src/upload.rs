@@ -1,6 +1,6 @@
 use axum::{extract::Multipart, http::StatusCode, response::IntoResponse};
 
-use crate::context::MESH_CONTEXT;
+use crate::context::DAEMON_CONTEXT;
 
 pub async fn plugin_upload(mut multipart: Multipart) -> impl IntoResponse {
 
@@ -27,7 +27,7 @@ pub async fn plugin_upload(mut multipart: Multipart) -> impl IntoResponse {
     let plugin_name = plugin_name.unwrap();
 
     {
-        let ctx = MESH_CONTEXT.read().await;
+        let ctx = DAEMON_CONTEXT.read().await;
         let mut libs = ctx.libs.write().await;
         _ = libs.remove(&plugin_name);
     }

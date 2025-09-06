@@ -1,4 +1,4 @@
-use plugin_mesh_core::{context::{Context, InvokeResult}, plugin};
+use plugind_core::{context::{Context, InvokeResult}, plugin};
 
 #[plugin]
 pub async fn init(input: Vec<u8>, mut ctx: Context) -> InvokeResult {
@@ -12,7 +12,7 @@ pub async fn init(input: Vec<u8>, mut ctx: Context) -> InvokeResult {
 #[cfg(test)]
 mod tests {
 
-    use plugin_mesh_core::{context::{Context, InvokeResult}, LibraryFn};
+    use plugind_core::{context::{Context, InvokeResult}, LibraryFn};
     use futures::future::BoxFuture;
 
     #[test]

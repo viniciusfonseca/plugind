@@ -1,5 +1,5 @@
 [package]
-name = "plugin-mesh-macros"
+name = "plugind-macros"
 version = "0.1.0"
 edition = "2024"
 

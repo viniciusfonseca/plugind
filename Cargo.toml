@@ -1,10 +1,10 @@
 [workspace]
 resolver = "3"
 members = [
-    "plugin-mesh",
+    "plugind",
     "plugin-example",
-    "plugin-mesh-core",
-    "plugin-mesh-macros",
+    "plugind-core",
+    "plugind-macros",
     "pluginctl"
 ]
 

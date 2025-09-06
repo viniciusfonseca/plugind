@@ -28,14 +28,14 @@ struct PluginConf {
 
 fn main() -> anyhow::Result<()> {
 
-    let plugin_mesh_url = std::env::var("PLUGIN_MESH_URL").unwrap_or("http://localhost:8080".to_string());
+    let plugind_url = std::env::var("PLUGIND_URL").unwrap_or("http://localhost:8080".to_string());
 
     match Cli::parse().command {
         PluginSubcommand::Create { name } => {
 
             std::process::Command::new("git")
                 .arg("clone")
-                .arg("https://github.com/viniciusfonseca/plugin-example.git")
+                .arg("https://github.com/viniciusfonseca/plugin-template.git")
                 .arg(&name)
                 .output()?;
             
@@ -59,7 +59,7 @@ fn main() -> anyhow::Result<()> {
 
             let client = reqwest::blocking::Client::new();
 
-            let res = client.post(format!("{}/plugin", plugin_mesh_url))
+            let res = client.post(format!("{}/plugin", plugind_url))
                 .multipart(form)
                 .send()?;
 

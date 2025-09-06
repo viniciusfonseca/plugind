@@ -6,4 +6,4 @@ pub mod context;
 
 pub type LibraryFn = fn(Vec<u8>, Context) -> BoxFuture<'static, InvokeResult>;
 
-pub use plugin_mesh_macros::plugin;
+pub use plugind_macros::plugin;

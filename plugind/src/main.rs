@@ -1,9 +1,9 @@
 use axum::response::IntoResponse;
-use plugin_mesh_core::context::InvokeResult;
+use plugind_core::context::InvokeResult;
 use serde::Deserialize;
 use serde_json::Value;
 
-use crate::{context::MESH_CONTEXT, invoke::invoke_plugin};
+use crate::{context::DAEMON_CONTEXT, invoke::invoke_plugin};
 
 mod context;
 mod invoke;
@@ -31,7 +31,7 @@ async fn main() -> anyhow::Result<()> {
     let client = aws_sdk_s3::Client::new(&config);
 
     {
-        MESH_CONTEXT.write().await.set_storage(&client);
+        DAEMON_CONTEXT.write().await.set_storage(&client);
     }
 
     let router = axum::Router::new()

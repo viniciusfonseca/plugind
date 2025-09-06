@@ -1929,43 +1929,7 @@ name = "plugin-example"
 version = "0.1.0"
 dependencies = [
  "futures",
- "plugin-mesh-core",
-]
-
-[[package]]
-name = "plugin-mesh"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "aws-config",
- "aws-sdk-s3",
- "axum",
- "futures",
- "libloading",
- "plugin-mesh-core",
- "serde",
- "serde_json",
- "tokio",
- "uuid",
-]
-
-[[package]]
-name = "plugin-mesh-core"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "futures",
- "plugin-mesh-macros",
-]
-
-[[package]]
-name = "plugin-mesh-macros"
-version = "0.1.0"
-dependencies = [
- "futures",
- "proc-macro2",
- "quote",
- "syn",
+ "plugind-core",
 ]
 
 [[package]]
@@ -1977,6 +1941,42 @@ dependencies = [
  "reqwest",
  "serde",
  "toml",
+]
+
+[[package]]
+name = "plugind"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "aws-config",
+ "aws-sdk-s3",
+ "axum",
+ "futures",
+ "libloading",
+ "plugind-core",
+ "serde",
+ "serde_json",
+ "tokio",
+ "uuid",
+]
+
+[[package]]
+name = "plugind-core"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "plugind-macros",
+]
+
+[[package]]
+name = "plugind-macros"
+version = "0.1.0"
+dependencies = [
+ "futures",
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]

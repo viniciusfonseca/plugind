@@ -17,8 +17,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN cargo build --bin plugin-mesh --release --target x86_64-unknown-linux-musl
+RUN cargo build --bin plugind --release --target x86_64-unknown-linux-musl
 
 FROM scratch
-COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/plugin-mesh .
-CMD ["./plugin-mesh"]
+COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/plugind .
+CMD ["./plugind"]
