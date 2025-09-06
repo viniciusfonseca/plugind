@@ -45,6 +45,7 @@ async fn main() -> anyhow::Result<()> {
 
     let router = axum::Router::new()
         .route("/invocations", axum::routing::post(invoke_handler))
+        .route("/plugins", axum::routing::get(upload::plugin_list))
         .route("/plugins", axum::routing::post(upload::plugin_upload));
 
     let listener = tokio::net::TcpListener::bind(addr_listen).await?;

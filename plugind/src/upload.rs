@@ -3,6 +3,28 @@ use jwt_simple::{claims::NoCustomClaims, prelude::MACLike};
 
 use crate::context::DAEMON_CONTEXT;
 
+pub async fn plugin_list() -> impl IntoResponse {
+
+    let ctx = DAEMON_CONTEXT.read().await;
+    let storage = ctx.storage.as_ref().unwrap();
+
+    let list = storage
+        .list_objects_v2()
+        .bucket("plugins")
+        .send()
+        .await
+        .unwrap();
+
+    let list = list.contents.unwrap();
+
+    let list = list.into_iter()
+        .map(|object| object.key.unwrap())
+        .collect::<Vec<String>>()
+        .join("\n");
+
+    (StatusCode::OK, list)
+}
+
 pub async fn plugin_upload(headers: HeaderMap, mut multipart: Multipart) -> impl IntoResponse {
 
     if let Some(public_key) = {
