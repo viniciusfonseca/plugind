@@ -45,9 +45,14 @@ fn main() -> anyhow::Result<()> {
         }
         PluginSubcommand::Deploy { plugin_conf } => {
             let cwd = std::env::current_dir()?;
+            let plugin_conf_path = cwd.join("plugind.toml");
+            if let Err(e) = std::fs::metadata(&plugin_conf_path) {
+                eprintln!("Failed to deploy plugin: {}", e);
+                return Err(e.into());
+            }
             let plugin_conf = match plugin_conf {
                 Some(f) => std::fs::read(f)?,
-                None => std::fs::read(cwd.join("plugin.toml"))?
+                None => std::fs::read(plugin_conf_path)?
             };
             let plugin_conf = toml::from_slice::<PluginConf>(&plugin_conf)?;
 
