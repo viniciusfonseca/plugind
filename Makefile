@@ -5,4 +5,6 @@ compose-up:
 invoke-example:
 	cargo build --package plugin-example --release
 	pluginctl deploy plugin-example/plugind.toml
-	curl -X POST http://localhost:8080 -H "Content-Type: application/json" -d "{\"lib_name\": \"plugin-example\", \"params\": \"\"}"
+	curl -X POST http://localhost:8080/invocations \
+		-H "Content-Type: application/json" \
+		-H "X-Plugin: plugin-example"

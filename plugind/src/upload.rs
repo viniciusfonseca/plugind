@@ -1,8 +1,23 @@
-use axum::{extract::Multipart, http::StatusCode, response::IntoResponse};
+use axum::{extract::Multipart, http::{HeaderMap, StatusCode}, response::IntoResponse};
+use jwt_simple::{claims::NoCustomClaims, prelude::MACLike};
 
 use crate::context::DAEMON_CONTEXT;
 
-pub async fn plugin_upload(mut multipart: Multipart) -> impl IntoResponse {
+pub async fn plugin_upload(headers: HeaderMap, mut multipart: Multipart) -> impl IntoResponse {
+
+    if let Some(public_key) = {
+        let ctx = DAEMON_CONTEXT.read().await;
+        ctx.public_key.clone()
+    } {
+        let token = match headers.get("authorization") {
+            Some(token) => token.to_str().unwrap().to_string(),
+            None => return (StatusCode::UNAUTHORIZED, "")
+        };
+
+        if public_key.verify_token::<NoCustomClaims>(&token, None).is_err() {
+            return (StatusCode::UNAUTHORIZED, "");
+        }
+    }
 
     let mut plugin_name = None;
     let mut plugin_bytes = None;
