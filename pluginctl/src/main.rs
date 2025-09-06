@@ -15,7 +15,9 @@ enum PluginSubcommand {
     Create {
         name: String
     },
-    Deploy
+    Deploy {
+        plugin_conf: Option<String>
+    }
 }
 
 #[derive(Deserialize)]
@@ -41,9 +43,12 @@ fn main() -> anyhow::Result<()> {
                 
             Ok(())
         }
-        PluginSubcommand::Deploy => {
+        PluginSubcommand::Deploy { plugin_conf } => {
             let cwd = std::env::current_dir()?;
-            let plugin_conf = std::fs::read(cwd.join("plugin.toml"))?;
+            let plugin_conf = match plugin_conf {
+                Some(f) => std::fs::read(f)?,
+                None => std::fs::read(cwd.join("plugin.toml"))?
+            };
             let plugin_conf = toml::from_slice::<PluginConf>(&plugin_conf)?;
 
             let plugin_bytes = std::fs::read(cwd.join(&plugin_conf.path))?;

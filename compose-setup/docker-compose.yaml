@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   plugin-mesh:
     build:
@@ -8,14 +9,20 @@ services:
       - "8080:8080"
     environment:
       ADDR_LISTEN: 0.0.0.0:8080
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: minio
+      AWS_SECRET_ACCESS_KEY: minio123
     
   minio:
-    image: minio/minio
+    image: quay.io/minio/minio
+    command: server /data --console-address ":9001"
     ports:
       - "9000:9000"
+      - "9001:9001"
     environment:
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: minio123
+      MINIO_DEFAULT_BUCKETS: plugins
     volumes:
       - minio_data:/data
 

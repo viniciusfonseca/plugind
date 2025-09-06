@@ -8,5 +8,4 @@ plugin-mesh-core = { path = "../plugin-mesh-core" }
 futures = "0.3"
 
 [lib]
-name = "plugin_example"
 crate-type = ["cdylib"]
