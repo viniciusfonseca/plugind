@@ -1,5 +1,7 @@
 use axum::{extract::Multipart, http::{HeaderMap, StatusCode}, response::IntoResponse};
+use futures::StreamExt;
 use jwt_simple::{claims::NoCustomClaims, prelude::MACLike};
+use minio::s3::types::ToStream;
 
 use crate::context::DAEMON_CONTEXT;
 
@@ -8,17 +10,16 @@ pub async fn plugin_list() -> impl IntoResponse {
     let ctx = DAEMON_CONTEXT.read().await;
     let storage = ctx.storage.as_ref().unwrap();
 
-    let list = storage
-        .list_objects_v2()
-        .bucket("plugins")
-        .send()
-        .await
+    let list = storage.list_objects("plugins")
+        .to_stream().await
+        .next().await
+        .unwrap()
         .unwrap();
 
-    let list = list.contents.unwrap();
+    let list = list.contents;
 
     let list = list.into_iter()
-        .map(|object| object.key.unwrap())
+        .map(|object| object.name)
         .collect::<Vec<String>>()
         .join("\n");
 
@@ -32,7 +33,7 @@ pub async fn plugin_upload(headers: HeaderMap, mut multipart: Multipart) -> impl
         ctx.public_key.clone()
     } {
         let token = match headers.get("authorization") {
-            Some(token) => token.to_str().unwrap().to_string(),
+            Some(token) => token.to_str().unwrap().to_string().replace("Bearer ", ""),
             None => return (StatusCode::UNAUTHORIZED, "")
         };
 

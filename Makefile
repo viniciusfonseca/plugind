@@ -1,6 +1,14 @@
+setup-docker:
+	sudo systemctl start docker
+	sudo chmod 777 /var/run/docker.sock
+
 compose-up:
-	docker compose -f ./compose-setup/docker-compose.yaml down
-	docker compose -f ./compose-setup/docker-compose.yaml up -d
+	docker compose down
+	docker compose up -d
+
+compose-up-build:
+	docker compose down
+	docker compose up --build -d
 
 invoke-example:
 	cargo build --package plugin-example --release

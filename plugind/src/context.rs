@@ -5,19 +5,21 @@ use tokio::sync::RwLock;
 
 #[derive(Clone)]
 pub struct DaemonContext {
-    pub storage: Option<aws_sdk_s3::Client>,
+    pub storage: Option<minio::s3::Client>,
     pub public_key: Option<HS256Key>,
     pub libs: Arc<RwLock<HashMap<String, Library>>>,
 }
 
 impl DaemonContext {
-    pub fn set_storage(&mut self, storage: &aws_sdk_s3::Client) -> &mut Self {
+    pub fn set_storage(&mut self, storage: &minio::s3::Client) -> &mut Self {
         self.storage = Some(storage.clone());
         self
     }
 
     pub fn set_public_key(&mut self, public_key: &Option<String>) -> &mut Self {
-        self.public_key = Some(HS256Key::from_bytes(public_key.as_ref().unwrap().as_bytes()));
+        if let Some(public_key) = public_key {
+            self.public_key = Some(HS256Key::from_bytes(public_key.as_bytes()));
+        }
         self
     }
 }

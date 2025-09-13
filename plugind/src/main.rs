@@ -1,5 +1,5 @@
-use aws_config::BehaviorVersion;
 use axum::{body::Bytes, http::HeaderMap, response::IntoResponse};
+use minio::s3::creds::StaticProvider;
 
 use crate::{context::DAEMON_CONTEXT, invoke::invoke_plugin};
 
@@ -29,17 +29,22 @@ async fn main() -> anyhow::Result<()> {
         .map(|path| std::fs::read_to_string(path).expect("Failed to read public key"))
         .ok();
 
-    let sdk_config = aws_config::load_defaults(BehaviorVersion::latest()).await;
+    let credentials_provider = StaticProvider::new(
+        &std::env::var("AWS_ACCESS_KEY_ID")?,
+        &std::env::var("AWS_SECRET_ACCESS_KEY")?,
+        None,
+    );
 
-    let config = sdk_config.to_builder()
-        .endpoint_url(aws_s3_endpoint)
-        .build();
-    
-    let client = aws_sdk_s3::Client::new(&config);
+    let storage = minio::s3::Client::new(
+        aws_s3_endpoint.parse()?,
+        Some(Box::new(credentials_provider)),
+        None,
+        None
+    )?;
 
     {
         DAEMON_CONTEXT.write().await
-            .set_storage(&client)
+            .set_storage(&storage)
             .set_public_key(&public_key);
     }
 

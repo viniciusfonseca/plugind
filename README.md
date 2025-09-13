@@ -38,8 +38,6 @@ Example plugin made with `plugind-core` and `plugind-macros`.
 To run the example:
 
 ```sh
-make start-server
-
-# in another terminal session
+make compose-up
 make invoke-example
 ```

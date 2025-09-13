@@ -12,11 +12,13 @@ struct Cli {
 
 #[derive(Debug, Clone, Subcommand)]
 enum PluginSubcommand {
+    List,
     Create {
         name: String
     },
     Deploy {
-        plugin_conf: Option<String>
+        plugin_conf: Option<String>,
+        token: Option<String>
     }
 }
 
@@ -31,6 +33,13 @@ fn main() -> anyhow::Result<()> {
     let plugind_url = std::env::var("PLUGIND_URL").unwrap_or("http://localhost:8080".to_string());
 
     match Cli::parse().command {
+        PluginSubcommand::List => {
+
+            let list = reqwest::blocking::get(format!("{}/plugins", plugind_url))?.text()?;
+
+            println!("{}", list);
+            Ok(())
+        }
         PluginSubcommand::Create { name } => {
 
             std::process::Command::new("git")
@@ -43,7 +52,7 @@ fn main() -> anyhow::Result<()> {
                 
             Ok(())
         }
-        PluginSubcommand::Deploy { plugin_conf } => {
+        PluginSubcommand::Deploy { plugin_conf, token } => {
             let cwd = std::env::current_dir()?;
             let plugin_conf_path = cwd.join("plugind.toml");
             if let Err(e) = std::fs::metadata(&plugin_conf_path) {
@@ -64,9 +73,14 @@ fn main() -> anyhow::Result<()> {
 
             let client = reqwest::blocking::Client::new();
 
-            let res = client.post(format!("{}/plugin", plugind_url))
-                .multipart(form)
-                .send()?;
+            let mut req = client.post(format!("{}/plugin", plugind_url))
+                .multipart(form);
+
+            if let Some(token) = token {
+                req = req.bearer_auth(token);
+            }
+
+            let res = req.send()?;
 
             if !res.status().is_success() {
                 return Err(anyhow::anyhow!("Failed to deploy plugin: {}, {}", res.status(), res.text()?));
