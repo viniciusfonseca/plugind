@@ -19,6 +19,10 @@ enum PluginSubcommand {
     Deploy {
         plugin_conf: Option<String>,
         token: Option<String>
+    },
+    Rpc {
+        lib_name: String,
+        input: Option<String>
     }
 }
 
@@ -88,6 +92,15 @@ fn main() -> anyhow::Result<()> {
 
             println!("Successfully deployed plugin: {}", &plugin_conf.name.clone());
 
+            Ok(())
+        },
+        PluginSubcommand::Rpc { lib_name, input } => {
+            let input = input.unwrap_or("".to_string()).as_bytes().to_vec();
+            let output = reqwest::blocking::Client::new()
+                .post(format!("{}/plugins/{}/rpc", plugind_url, lib_name))
+                .body(input)
+                .send()?;
+            println!("{}", String::from_utf8_lossy(&output.bytes()?));
             Ok(())
         }
     }

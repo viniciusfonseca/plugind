@@ -34,10 +34,3 @@ pub async fn init(input: Vec<u8>, mut ctx: Context) -> InvokeResult {
 ### `plugin-example`
 
 Example plugin made with `plugind-core` and `plugind-macros`.
-
-To run the example:
-
-```sh
-make compose-up
-make invoke-example
-```

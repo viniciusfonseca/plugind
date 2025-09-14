@@ -1,18 +1,13 @@
-use axum::{body::Bytes, http::HeaderMap, response::IntoResponse};
+use axum::{body::Bytes, extract::Path, response::IntoResponse};
 use minio::s3::creds::StaticProvider;
 
-use crate::{context::DAEMON_CONTEXT, invoke::invoke_plugin};
+use crate::{context::DAEMON_CONTEXT, rpc::invoke_plugin};
 
 mod context;
-mod invoke;
+mod rpc;
 mod upload;
 
-async fn invoke_handler(headers: HeaderMap, body: Bytes) -> impl IntoResponse {
-    let plugin = match headers.get("x-plugin") {
-        Some(plugin) => plugin.to_str().unwrap().to_string(),
-        None => return (axum::http::StatusCode::BAD_REQUEST, "Missing 'X-Plugin' header".as_bytes().to_vec())
-    };
-
+async fn rpc_handler(Path(plugin): Path<String>, body: Bytes) -> impl IntoResponse {
     match invoke_plugin(plugin, body.to_vec()).await {
         Ok(output_buffer) => (axum::http::StatusCode::OK, output_buffer),
         Err(err) => (axum::http::StatusCode::INTERNAL_SERVER_ERROR, err.to_string().as_bytes().to_vec())
@@ -49,7 +44,7 @@ async fn main() -> anyhow::Result<()> {
     }
 
     let router = axum::Router::new()
-        .route("/invocations", axum::routing::post(invoke_handler))
+        .route("/plugins/{plugin_name}/rpc", axum::routing::post(rpc_handler))
         .route("/plugins", axum::routing::get(upload::plugin_list))
         .route("/plugins", axum::routing::post(upload::plugin_upload));
 
