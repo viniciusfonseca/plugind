@@ -1,4 +1,4 @@
-FROM rust:1.88.0-bullseye AS builder
+FROM rust:1.88.0-trixie AS builder
 
 WORKDIR /app
 COPY . .
@@ -6,7 +6,7 @@ COPY . .
 RUN rustup target add x86_64-unknown-linux-gnu
 RUN cargo build --release --target x86_64-unknown-linux-gnu --package plugind
 
-FROM debian:bullseye
+FROM debian:trixie
 
 COPY --from=builder /app/target/x86_64-unknown-linux-gnu/release/plugind /usr/local/bin/plugind
 

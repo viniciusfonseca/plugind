@@ -1,11 +1,17 @@
-use std::path::Path;
-
+use axum::{body::Bytes, extract::Path, response::IntoResponse};
 use futures::future::BoxFuture;
 use minio::s3::types::S3Api;
 use plugind_core::{context::{Context, InvokeResult}, LibraryFn};
 use libloading::{Library, Symbol};
 
 use crate::context::DAEMON_CONTEXT;
+
+pub async fn rpc_handler(Path(plugin): Path<String>, body: Bytes) -> impl IntoResponse {
+    match invoke_plugin(plugin, body.to_vec()).await {
+        Ok(output_buffer) => (axum::http::StatusCode::OK, output_buffer),
+        Err(err) => (axum::http::StatusCode::INTERNAL_SERVER_ERROR, err.to_string().as_bytes().to_vec())
+    }
+}
 
 pub fn invoke_plugin(lib_name: String, input: Vec<u8>) -> BoxFuture<'static, InvokeResult> {
 
@@ -23,7 +29,7 @@ pub fn invoke_plugin(lib_name: String, input: Vec<u8>) -> BoxFuture<'static, Inv
             let lib = storage.get_object("plugins", &lib_name).send().await.unwrap();
             let id = uuid::Uuid::new_v4().to_string();
             let tmp_path = format!("/tmp/{}", id);
-            lib.content.to_file(Path::new(&tmp_path)).await.unwrap();
+            lib.content.to_file(std::path::Path::new(&tmp_path)).await.unwrap();
             let mut libs = ctx.libs.write().await;
             libs.insert(lib_name.clone(), unsafe { Library::new(&tmp_path)? });
             tokio::fs::remove_file(&tmp_path).await.unwrap();

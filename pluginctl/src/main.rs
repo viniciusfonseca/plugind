@@ -77,7 +77,7 @@ fn main() -> anyhow::Result<()> {
 
             let client = reqwest::blocking::Client::new();
 
-            let mut req = client.post(format!("{}/plugin", plugind_url))
+            let mut req = client.post(format!("{}/plugins", plugind_url))
                 .multipart(form);
 
             if let Some(token) = token {

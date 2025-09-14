@@ -1,20 +1,12 @@
-use axum::{body::Bytes, extract::Path, response::IntoResponse};
 use minio::s3::creds::StaticProvider;
 
-use crate::{context::DAEMON_CONTEXT, rpc::invoke_plugin};
+use crate::{context::DAEMON_CONTEXT, rpc::rpc_handler};
 
 mod context;
 mod rpc;
 mod upload;
 
-async fn rpc_handler(Path(plugin): Path<String>, body: Bytes) -> impl IntoResponse {
-    match invoke_plugin(plugin, body.to_vec()).await {
-        Ok(output_buffer) => (axum::http::StatusCode::OK, output_buffer),
-        Err(err) => (axum::http::StatusCode::INTERNAL_SERVER_ERROR, err.to_string().as_bytes().to_vec())
-    }
-}
-
-#[tokio::main(flavor = "current_thread")]
+#[tokio::main]
 async fn main() -> anyhow::Result<()> {
 
     let addr_listen = std::env::var("ADDR_LISTEN")?;
@@ -30,12 +22,9 @@ async fn main() -> anyhow::Result<()> {
         None,
     );
 
-    let storage = minio::s3::Client::new(
-        aws_s3_endpoint.parse()?,
-        Some(Box::new(credentials_provider)),
-        None,
-        None
-    )?;
+    let storage = minio::s3::ClientBuilder::new(aws_s3_endpoint.parse()?)
+        .provider(Some(Box::new(credentials_provider)))
+        .build()?;
 
     {
         DAEMON_CONTEXT.write().await

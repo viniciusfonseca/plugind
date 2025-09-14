@@ -1,7 +1,7 @@
 use axum::{extract::Multipart, http::{HeaderMap, StatusCode}, response::IntoResponse};
 use futures::StreamExt;
 use jwt_simple::{claims::NoCustomClaims, prelude::MACLike};
-use minio::s3::types::ToStream;
+use minio::s3::{segmented_bytes::SegmentedBytes, types::{S3Api, ToStream}};
 
 use crate::context::DAEMON_CONTEXT;
 
@@ -52,12 +52,10 @@ pub async fn plugin_upload(headers: HeaderMap, mut multipart: Multipart) -> impl
 
         match name.as_str() {
             "name" => plugin_name = Some(String::from_utf8_lossy(&data).to_string()),
-            "file" => plugin_bytes = Some(data.to_vec()),
+            "file" => plugin_bytes = Some(data),
             _ => (),
         }
     }
-
-    let libs_path = std::env::var("LIBS_PATH").unwrap();
 
     if plugin_name.is_none() || plugin_bytes.is_none() {
         return (StatusCode::BAD_REQUEST, "Missing plugin name or file");
@@ -68,10 +66,10 @@ pub async fn plugin_upload(headers: HeaderMap, mut multipart: Multipart) -> impl
         let ctx = DAEMON_CONTEXT.read().await;
         let mut libs = ctx.libs.write().await;
         _ = libs.remove(&plugin_name);
+        let storage = ctx.storage.as_ref().unwrap();
+        let plugin_bytes = SegmentedBytes::from(plugin_bytes.unwrap());
+        let _ = storage.put_object("plugins", &plugin_name, plugin_bytes).send().await.unwrap();
     }
-
-    let plugin_path = format!("{}/{}.so", libs_path, plugin_name);
-    tokio::fs::write(plugin_path, plugin_bytes.unwrap()).await.unwrap();
 
     (StatusCode::OK, "")
 }
