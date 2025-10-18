@@ -8,7 +8,22 @@ use crate::context::DAEMON_CONTEXT;
 
 pub async fn rpc_handler(Path(plugin): Path<String>, body: Bytes) -> impl IntoResponse {
     match invoke_plugin(plugin, body.to_vec()).await {
-        Ok(output_buffer) => (axum::http::StatusCode::OK, output_buffer),
+        Ok(output_buffer) => {
+            let mut headers = [httparse::EMPTY_HEADER; 128];
+            let mut res = httparse::Response::new(&mut headers);
+            match res.parse(&output_buffer) {
+                Ok(status) => {
+                    match status {
+                        httparse::Status::Complete(len) => (
+                            axum::http::StatusCode::from_u16(res.code.unwrap()).unwrap(),
+                            output_buffer[..len].to_vec()
+                        ),
+                        httparse::Status::Partial => (axum::http::StatusCode::OK, output_buffer)
+                    }
+                },
+                Err(_) => (axum::http::StatusCode::OK, output_buffer)
+            }
+        },
         Err(err) => (axum::http::StatusCode::INTERNAL_SERVER_ERROR, err.to_string().as_bytes().to_vec())
     }
 }

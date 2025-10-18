@@ -1688,6 +1688,7 @@ dependencies = [
  "anyhow",
  "axum",
  "futures",
+ "httparse",
  "jwt-simple",
  "libloading",
  "minio",
