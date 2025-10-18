@@ -7,7 +7,7 @@ members = [
     "plugind-core",
     "plugind-macros",
     "pluginctl"
-]
+, "plugind-http"]
 
 [profile.release]
 lto = true
