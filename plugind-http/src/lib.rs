@@ -25,3 +25,25 @@ impl Json {
         anyhow::Error::msg(buf)
     }
 }
+
+pub struct HttpResponse {
+    pub status: u16,
+    pub body: Vec<u8>,
+}
+
+impl TryFrom<Vec<u8>> for HttpResponse {
+
+    type Error = anyhow::Error;
+
+    fn try_from(bytes: Vec<u8>) -> Result<Self, Self::Error> {
+        let mut headers = [httparse::EMPTY_HEADER; 128];
+        let mut res = httparse::Response::new(&mut headers);
+        let parse_status = res.parse(&bytes)?;
+        if let httparse::Status::Complete(len) = parse_status {
+            Ok(HttpResponse { status: res.code.unwrap_or(0), body: bytes[..len].to_vec() })
+        }
+        else {
+            Err(anyhow::Error::msg("Failed to parse HTTP response"))
+        }
+    }
+}
