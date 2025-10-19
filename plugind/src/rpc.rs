@@ -19,7 +19,7 @@ pub async fn rpc_handler(Path(plugin): Path<String>, body: Bytes) -> impl IntoRe
         Ok(status) => {
             match status {
                 httparse::Status::Complete(len) => (
-                    axum::http::StatusCode::from_u16(res.code.unwrap()).unwrap(),
+                    axum::http::StatusCode::from_u16(res.code.unwrap_or(default_status_code.as_u16())).unwrap(),
                     output_buffer[..len].to_vec()
                 ),
                 httparse::Status::Partial => (default_status_code, output_buffer)
