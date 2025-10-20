@@ -1,10 +1,11 @@
+use serde::Serialize;
 use serde_json::json;
 
 pub struct Json;
 
 impl Json {
 
-    pub fn response(status: u16, body: serde_json::Value) -> anyhow::Result<Vec<u8>> {
+    pub fn response(status: u16, body: impl Serialize) -> anyhow::Result<Vec<u8>> {
         let mut buf = Vec::new();
         let body = serde_json::to_vec(&body)?;
         buf.extend_from_slice(format!("HTTP/1.1 {}\r\n", status).as_bytes());
