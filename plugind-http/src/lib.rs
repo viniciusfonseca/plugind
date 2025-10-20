@@ -32,11 +32,11 @@ pub struct HttpResponse {
     pub body: Vec<u8>,
 }
 
-impl TryFrom<Vec<u8>> for HttpResponse {
+impl TryFrom<&Vec<u8>> for HttpResponse {
 
     type Error = anyhow::Error;
 
-    fn try_from(bytes: Vec<u8>) -> Result<Self, Self::Error> {
+    fn try_from(bytes: &Vec<u8>) -> Result<Self, Self::Error> {
         let mut headers = [httparse::EMPTY_HEADER; 128];
         let mut res = httparse::Response::new(&mut headers);
         let parse_status = res.parse(&bytes)?;
