@@ -41,7 +41,7 @@ impl TryFrom<&Vec<u8>> for HttpResponse {
         let mut res = httparse::Response::new(&mut headers);
         let parse_status = res.parse(&bytes)?;
         if let httparse::Status::Complete(len) = parse_status {
-            Ok(HttpResponse { status: res.code.unwrap_or(0), body: bytes[..len].to_vec() })
+            Ok(HttpResponse { status: res.code.unwrap_or(0), body: bytes[len..].to_vec() })
         }
         else {
             Err(anyhow::Error::msg("Failed to parse HTTP response"))
